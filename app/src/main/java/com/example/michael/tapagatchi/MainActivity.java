@@ -1,16 +1,25 @@
 package com.example.michael.tapagatchi;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends ActionBarActivity {
 
     private ImageButton tapagachiAvatar;
+    private ProgressBar happinessProgressBar;
+    private int totalNumberOfHappinessStates = 4;
+    private int happinessLevel = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,7 +27,20 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         tapagachiAvatar = (ImageButton) findViewById(R.id.tapagachiAvatar);
+        happinessProgressBar = (ProgressBar) findViewById(R.id.happinessProgressBar);
         tapagachiAvatar.setOnClickListener(onClick());
+
+
+        //every 5 second or so .. decrease happiness by 1 and update the ui
+        new Timer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if(happinessLevel > 1){
+                    happinessLevel--;
+                    mHandler.obtainMessage(1).sendToTarget();
+                }
+            }
+        }, 0, 5000);
     }
 
 
@@ -46,21 +68,35 @@ public class MainActivity extends ActionBarActivity {
 
     private View.OnClickListener onClick() {
         return new View.OnClickListener() {
-            int happinessLevel = 0;
             @Override
             public void onClick(View v) {
                 try {
-                    if(happinessLevel < 4){
+                    if(happinessLevel < totalNumberOfHappinessStates){
                         happinessLevel++;
                     }
-                    Context context = tapagachiAvatar.getContext();
-                    int imageId = context.getResources().getIdentifier("tapagatchi_" + happinessLevel, "drawable", context.getPackageName());
-                    tapagachiAvatar.setImageResource(imageId);
+                    updateHappinessUi();
                 }
                 catch(Exception e){
 
                 }
             }
         };
+    }
+
+    /**
+     * handler thanks to https://stackoverflow.com/questions/6700802/android-timer-updating-a-textview-ui
+     */
+    public Handler mHandler = new Handler() {
+        public void handleMessage(Message msg) {
+            updateHappinessUi();
+        }
+    };
+
+    private void updateHappinessUi(){
+        Context context = tapagachiAvatar.getContext();
+        int imageId = context.getResources().getIdentifier("tapagatchi_" + happinessLevel, "drawable", context.getPackageName());
+        tapagachiAvatar.setImageResource(imageId);
+
+        happinessProgressBar.setProgress(happinessLevel * 100/totalNumberOfHappinessStates);
     }
 }
