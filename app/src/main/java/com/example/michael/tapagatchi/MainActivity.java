@@ -18,7 +18,7 @@ public class MainActivity extends ActionBarActivity {
 
     private ImageButton tapagachiAvatar;
     private ProgressBar happinessProgressBar;
-    private int totalNumberOfHappinessStates = 4;
+    private int totalNumberOfHappinessStates = 120;
     private int happinessLevel = 0;
 
     @Override
@@ -72,7 +72,7 @@ public class MainActivity extends ActionBarActivity {
             public void onClick(View v) {
                 try {
                     if(happinessLevel < totalNumberOfHappinessStates){
-                        happinessLevel++;
+                        happinessLevel += 5;
                     }
                     updateHappinessUi();
                 }
